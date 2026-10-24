@@ -1,5 +1,4 @@
 #include <array>
-#include <cstddef>
 #include <deque>
 #include <fstream>
 #include <functional>
@@ -26,7 +25,7 @@ int main() {
   using T1 = long;
   using T2 = double;
 
-  const std::size_t M = 15;
+  const int M = 15;
   const T1 N = 50000;
 
   std::mt19937 generator(std::random_device{}());
@@ -37,13 +36,13 @@ int main() {
   // не допускаем повторов среди всех 60 исходных элементов
   std::set<T1> used;
 
-  std::array<long, M> sourceArray{};
+  std::array<T1, M> sourceArray{};
   std::vector<T1> sourceVector(M);
   std::list<T1> sourceList(M);
   std::deque<T1> sourceDeque(M);
 
   std::list<T1>::iterator fillList = sourceList.begin();
-  for (std::size_t i = 0; i < M; ++i, ++fillList) {
+  for (int i = 0; i < M; ++i, ++fillList) {
     sourceArray[i] = randomValue(generator, distribution, used);
     sourceVector[i] = randomValue(generator, distribution, used);
     *fillList = randomValue(generator, distribution, used);
@@ -57,22 +56,22 @@ int main() {
   std::array<T2, M> resultArray{};
 
   // array -> vector: классический for
-  for (std::size_t i = 0; i < M; ++i) {
+  for (int i = 0; i < M; ++i) {
     resultVector.push_back(Hypo::hypotenuse_plus_mod<T2, T1>(sourceArray[i], secondArgument));
   }
 
   // vector -> list: for с итератором
   for (std::vector<T1>::const_iterator it = sourceVector.cbegin(); it != sourceVector.cend(); ++it) {
-    resultList.push_back(Hypo::hypotenuse_plus_mod<T2>(*it, secondArgument));
+    resultList.push_back(Hypo::hypotenuse_plus_mod<T2, T1>(*it, secondArgument));
   }
 
   // list -> deque: range-based for
   for (const T1& value : sourceList) {
-    resultDeque.push_back(Hypo::hypotenuse_plus_mod<T2>(value, secondArgument));
+    resultDeque.push_back(Hypo::hypotenuse_plus_mod<T2, T1>(value, secondArgument));
   }
-
+  
   // deque -> array: range-based for с индексом результата
-  std::size_t index = 0;
+  int index = 0;
   for (const T1& value : sourceDeque) {
     resultArray[index] = Hypo::hypotenuse_plus_mod<T2>(value, secondArgument);
     ++index;
