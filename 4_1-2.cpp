@@ -7,166 +7,166 @@
 #include <algorithm>
 #include <numeric>
 
-// С‡РёС‚Р°РµРј С‡РёСЃР»Р°, СЂР°Р·РґРµР»РµРЅРЅС‹Рµ РїСЂРѕР±РµР»Р°РјРё, РїРµСЂРµРІРѕРґР°РјРё СЃС‚СЂРѕРє РёР»Рё Р·Р°РїСЏС‚С‹РјРё
+// читаем числа, разделенные пробелами, переводами строк или запятыми
 std::vector<int> readNumbers(const std::string& fileName) {
-  std::ifstream file(fileName);
-  std::vector<int> numbers;
-  int number;
+    std::ifstream file(fileName);
+    std::vector<int> numbers;
+    int number;
 
-  while (file >> number) {
-    numbers.push_back(number);
-    file >> std::ws;
-    if (file.peek() == ',') {
-      file.get();
+    while (file >> number) { // тип number = int ...
+        numbers.push_back(number);
+        file >> std::ws; // манипулятор потока пропуск пробелов табуляции и перевода строки
+        if (file.peek() == ',') {
+            file.get();
+        }
     }
-  }
-  return numbers;
+    return numbers;
 }
 
-// РїРµСЂРІС‹Р№ СЃРїРѕСЃРѕР± РїРѕРґСЃС‡РµС‚Р° РїРѕРІС‚РѕСЂРµРЅРёР№: РѕР±С‹С‡РЅС‹Р№ for
+// первый способ подсчета повторений: обычный for
 int countNumber(const std::vector<int>& numbers, int value) {
-  int count = 0;
-  for (int number : numbers) {
-    if (number == value) {
-      ++count;
+    int count = 0;
+    for (int number : numbers) {
+        if (number == value) {
+            ++count;
+        }
     }
-  }
-  return count;
+    return count;
 }
 
-// РІС‹С‡РёСЃР»РµРЅРёСЏ Р·Р°РґР°РЅРёСЏ 4.1 РґР»СЏ РѕРґРЅРѕРіРѕ РІРµРєС‚РѕСЂР°
+// вычисления задания 4.1 для одного вектора
 void showVector(const std::vector<int>& numbers, const std::string& name) {
-  std::cout << "\n" << name << '\n';
-  std::cout << "РљРѕР»РёС‡РµСЃС‚РІРѕ С‡РёСЃРµР»: " << numbers.size() << '\n';
+    std::cout << "\n" << name << '\n';
+    std::cout << "count of numbers: " << numbers.size() << '\n';
 
-  // set РЅСѓР¶РµРЅ, С‡С‚РѕР±С‹ РєР°Р¶РґРѕРµ С‡РёСЃР»Рѕ РІС‹РІРѕРґРёР»РѕСЃСЊ РѕРґРёРЅ СЂР°Р·
-  std::set<int> unique(numbers.begin(), numbers.end());
+    // set нужен, чтобы каждое число выводилось один раз
+    std::set<int> unique(numbers.begin(), numbers.end());
 
-  std::cout << "Р§Р°СЃС‚РѕС‚С‹ С‡РµСЂРµР· for:\n";
-  for (int value : unique) {
-    std::cout << value << ": " << countNumber(numbers, value) << '\n';
-  }
+    std::cout << "for:\n";
+    for (int value : unique) {
+        std::cout << value << ": " << countNumber(numbers, value) << '\n';
+    }
 
-  std::cout << "Р§Р°СЃС‚РѕС‚С‹ С‡РµСЂРµР· std::count:\n";
-  for (int value : unique) {
-    std::cout << value << ": " << std::count(numbers.begin(), numbers.end(), value) << '\n';
-  }
+    std::cout << "\nstd::count:\n";
+    for (int value : unique) {
+        std::cout << value << ": " << std::count(numbers.begin(), numbers.end(), value) << '\n';
+    }
 
-  // РїРµСЂРІС‹Р№ СЃРїРѕСЃРѕР± РІС‹С‡РёСЃР»РµРЅРёСЏ СЃСѓРјРјС‹
-  long long sum1 = std::accumulate(numbers.begin(), numbers.end(), 0LL);
+    // первый способ вычисления суммы
+    long long sum1 = std::accumulate(numbers.begin(), numbers.end(), 0LL);
 
-  // РІС‚РѕСЂРѕР№ СЃРїРѕСЃРѕР± РІС‹С‡РёСЃР»РµРЅРёСЏ СЃСѓРјРјС‹
-  long long sum2 = 0;
-  std::for_each(numbers.begin(), numbers.end(), [&sum2](int number) {
-    sum2 += number;
-  });
-  std::cout << "РЎСѓРјРјР° С‡РµСЂРµР· accumulate: " << sum1 << '\n';
-  std::cout << "РЎСѓРјРјР° С‡РµСЂРµР· for_each: " << sum2 << '\n';
+    // второй способ вычисления суммы
+    long long sum2 = 0;
+    std::for_each(numbers.begin(), numbers.end(), [&sum2](int number) {
+        sum2 += number;
+        });
+    std::cout << "Sum accumulate: " << sum1 << '\n';
+    std::cout << "Sum for_each: " << sum2 << '\n';
 
-  // РµСЃР»Рё СЌР»РµРјРµРЅС‚РѕРІ РјРµРЅСЊС€Рµ РґРµСЃСЏС‚Рё, РЅРµ РІС‹С…РѕРґРёРј Р·Р° РіСЂР°РЅРёС†С‹ РІРµРєС‚РѕСЂР°
-  int count = static_cast<int>(std::min<std::size_t>(10, numbers.size()));
-  long long sum10 = std::accumulate(numbers.begin(), numbers.begin() + count, 0LL);
-  std::cout << "РЎСѓРјРјР° РїРµСЂРІС‹С… " << count << " СЌР»РµРјРµРЅС‚РѕРІ: " << sum10 << '\n';
+    // если элементов меньше десяти, не выходим за границы вектора
+    int count = static_cast<int>(std::min<std::size_t>(10, numbers.size()));
+    long long sum10 = std::accumulate(numbers.begin(), numbers.begin() + count, 0LL);
+    std::cout << "Sum of first " << count << " elements: " << sum10 << '\n';
 }
 
 // 4.2.1
-// РїСЂРѕРёР·РІРµРґРµРЅРёРµ РїРµСЂРІРѕРіРѕ С„Р°Р№Р»Р° Р±РѕР»СЊС€РѕРµ, РїРѕСЌС‚РѕРјСѓ С…СЂР°РЅРёРј РµРіРѕ СЃС‚СЂРѕРєРѕР№
+// произведение первого файла большое, поэтому храним его строкой
 std::string multiplySelected(std::string result, int number) {
-  if (number == 0 || number <= -50 || number >= 50) {
+    if (number == 0 || number <= -50 || number >= 50) {
+        return result;
+    }
+
+    bool negative = (result[0] == '-') != (number < 0);
+    if (result[0] == '-') {
+        result.erase(0, 1);
+    }
+    if (number < 0) {
+        number = -number;
+    }
+
+    // умножение в столбик справа налево
+    int carry = 0;
+    for (std::string::reverse_iterator it = result.rbegin(); it != result.rend(); ++it) {
+        int current = (*it - '0') * number + carry;
+        *it = static_cast<char>('0' + current % 10);
+        carry = current / 10;
+    }
+    while (carry > 0) {
+        result.insert(result.begin(), static_cast<char>('0' + carry % 10));
+        carry /= 10;
+    }
+    if (negative) {
+        result.insert(result.begin(), '-');
+    }
     return result;
-  }
-
-  bool negative = (result[0] == '-') != (number < 0);
-  if (result[0] == '-') {
-    result.erase(0, 1);
-  }
-  if (number < 0) {
-    number = -number;
-  }
-
-  // СѓРјРЅРѕР¶РµРЅРёРµ РІ СЃС‚РѕР»Р±РёРє СЃРїСЂР°РІР° РЅР°Р»РµРІРѕ
-  int carry = 0;
-  for (std::string::reverse_iterator it = result.rbegin(); it != result.rend(); ++it) {
-    int current = (*it - '0') * number + carry;
-    *it = static_cast<char>('0' + current % 10);
-    carry = current / 10;
-  }
-  while (carry > 0) {
-    result.insert(result.begin(), static_cast<char>('0' + carry % 10));
-    carry /= 10;
-  }
-  if (negative) {
-    result.insert(result.begin(), '-');
-  }
-  return result;
 }
 
 int main() {
-  // ==================== 4.1 ====================
+    // ==================== 4.1 ====================
 
-  std::vector<int> first = readNumbers("s04_v1_45_1.txt");
-  std::vector<int> second = readNumbers("s04_v1_45_2.txt");
+    std::vector<int> first = readNumbers("s04_v1_45_1.txt");
+    std::vector<int> second = readNumbers("s04_v1_45_2.txt");
 
-  std::cout << "4.1\n";
-  std::cout << "s04_v1_45_1.txt: " << first.size() << " С‡РёСЃРµР»\n";
-  std::cout << "s04_v1_45_2.txt: " << second.size() << " С‡РёСЃРµР»\n";
+    std::cout << "4.1\n";
+    std::cout << "s04_v1_45_1.txt: " << first.size() << " numbers\n";
+    std::cout << "s04_v1_45_2.txt: " << second.size() << " numbers\n";
 
-  // РїРµСЂРІС‹Р№ РІРµРєС‚РѕСЂ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€РёРј РїРѕ РєРѕР»РёС‡РµСЃС‚РІСѓ СЌР»РµРјРµРЅС‚РѕРІ
-  if (first.size() < second.size()) {
-    first.swap(second);
-  }
-
-  showVector(first, "РџРµСЂРІС‹Р№ РІРµРєС‚РѕСЂ");
-  showVector(second, "Р’С‚РѕСЂРѕР№ РІРµРєС‚РѕСЂ");
-
-  // ==================== 4.2 ====================
-  std::cout << "\n4.2\n";
-
-  // 4.2.1: РїСЂРѕРёР·РІРµРґРµРЅРёРµ РїРѕРґС…РѕРґСЏС‰РёС… С‡РёСЃРµР» С‡РµСЂРµР· accumulate
-  std::string product1 = std::accumulate(first.begin(), first.end(), std::string("1"), multiplySelected);
-  std::string product2 = std::accumulate(second.begin(), second.end(), std::string("1"), multiplySelected);
-  std::cout << "РџСЂРѕРёР·РІРµРґРµРЅРёРµ РїРµСЂРІРѕРіРѕ: " << product1 << '\n';
-  std::cout << "РџСЂРѕРёР·РІРµРґРµРЅРёРµ РІС‚РѕСЂРѕРіРѕ: " << product2 << '\n';
-
-  std::set<int> unique1(first.begin(), first.end());
-  std::set<int> unique2(second.begin(), second.end());
-
-  // 4.2.2: РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ С‡РёСЃР»Р° РєР°Р¶РґРѕРіРѕ РІРµРєС‚РѕСЂР°
-  std::cout << "\nР’Рѕ РІС‚РѕСЂРѕРј РІРµРєС‚РѕСЂРµ РІСЃС‚СЂРµС‡Р°СЋС‚СЃСЏ 2 Рё Р±РѕР»РµРµ СЂР°Р·:\n";
-  for (int value : unique2) {
-    int count = countNumber(second, value);
-    if (count >= 2) {
-      std::cout << value << ": " << count << '\n';
+    // первый вектор должен быть большим по количеству элементов
+    if (first.size() < second.size()) {
+        first.swap(second);
     }
-  }
 
-  std::cout << "\nР’ РїРµСЂРІРѕРј РІРµРєС‚РѕСЂРµ РІСЃС‚СЂРµС‡Р°СЋС‚СЃСЏ Р±РѕР»РµРµ 3 СЂР°Р·:\n";
-  for (int value : unique1) {
-    int count = countNumber(first, value);
-    if (count > 3) {
-      std::cout << value << ": " << count << '\n';
+    showVector(first, "First vector");
+    showVector(second, "Second vector");
+
+    // ==================== 4.2 ====================
+    std::cout << "\n4.2\n";
+
+    // 4.2.1: произведение подходящих чисел через accumulate
+    std::string product1 = std::accumulate(first.begin(), first.end(), std::string("1"), multiplySelected);
+    std::string product2 = std::accumulate(second.begin(), second.end(), std::string("1"), multiplySelected);
+    std::cout << "Multiple first: " << product1 << '\n';
+    std::cout << "Multiple second: " << product2 << '\n';
+
+    std::set<int> unique1(first.begin(), first.end());
+    std::set<int> unique2(second.begin(), second.end());
+
+    // 4.2.2: повторяющиеся числа каждого вектора
+    std::cout << "\nIn second vector count 2 and more:\n";
+    for (int value : unique2) {
+        int count = countNumber(second, value);
+        if (count >= 2) {
+            std::cout << value << ": " << count << '\n';
+        }
     }
-  }
 
-  // 4.2.3Р°: РѕР±С‰РёРµ С‡РёСЃР»Р° С‡РµСЂРµР· for
-  std::cout << "\nРћР±С‰РёРµ С‡РёСЃР»Р° С‡РµСЂРµР· for:\n";
-  for (int value : unique2) {
-    int count1 = countNumber(first, value);
-    int count2 = countNumber(second, value);
-    if (count1 > 3 && count2 >= 2) {
-      std::cout << value << ": РїРµСЂРІС‹Р№ = " << count1 << ", РІС‚РѕСЂРѕР№ = " << count2 << '\n';
+    std::cout << "\nIn first vector count morethan 3:\n";
+    for (int value : unique1) {
+        int count = countNumber(first, value);
+        if (count > 3) {
+            std::cout << value << ": " << count << '\n';
+        }
     }
-  }
 
-  // 4.2.3Р±: РѕР±С‰РёРµ С‡РёСЃР»Р° С‡РµСЂРµР· Р°Р»РіРѕСЂРёС‚Рј СЃ Р»СЏРјР±РґРѕР№
-  std::cout << "\nРћР±С‰РёРµ С‡РёСЃР»Р° С‡РµСЂРµР· for_each:\n";
-  std::for_each(unique2.begin(), unique2.end(), [&first, &second](int value) {
-    int count1 = static_cast<int>(std::count(first.begin(), first.end(), value));
-    int count2 = static_cast<int>(std::count(second.begin(), second.end(), value));
-    if (count1 > 3 && count2 >= 2) {
-      std::cout << value << ": РїРµСЂРІС‹Р№ = " << count1 << ", РІС‚РѕСЂРѕР№ = " << count2 << '\n';
+    // 4.2.3а: общие числа через for
+    std::cout << "\nGlobal numbers using `for`:\n";
+    for (int value : unique2) {
+        int count1 = countNumber(first, value);
+        int count2 = countNumber(second, value);
+        if (count1 > 3 && count2 >= 2) {
+            std::cout << value << ": first = " << count1 << ", second = " << count2 << '\n';
+        }
     }
-  });
 
-  return 0;
+    // 4.2.3б: общие числа через алгоритм с лямбдой
+    std::cout << "\nGlobal numbers using `for_each`:\n";
+    std::for_each(unique2.begin(), unique2.end(), [&first, &second](int value) {
+        int count1 = static_cast<int>(std::count(first.begin(), first.end(), value));
+        int count2 = static_cast<int>(std::count(second.begin(), second.end(), value));
+        if (count1 > 3 && count2 >= 2) {
+            std::cout << value << ": first = " << count1 << ", second = " << count2 << '\n';
+        }
+        });
+
+    return 0;
 }
